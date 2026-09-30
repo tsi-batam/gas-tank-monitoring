@@ -1,0 +1,1559 @@
+:root {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #172033;
+  background: #f4f7fb;
+  font-synthesis: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+.loading {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+}
+
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #0d2340, #176b87);
+}
+
+.login-card {
+  width: min(430px, 92vw);
+  background: #fff;
+  padding: 34px;
+  border-radius: 18px;
+  box-shadow: 0 20px 60px #0003;
+}
+
+.brand {
+  font-weight: 800;
+  color: #176b87;
+  letter-spacing: 0.08em;
+  font-size: 13px;
+}
+
+.login-card h1 {
+  margin: 8px 0 5px;
+  font-size: 25px;
+}
+
+.muted {
+  color: #6b7280;
+}
+
+.login-card label,
+.grid-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-top: 16px;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid #d6dce5;
+  border-radius: 9px;
+  padding: 11px 12px;
+  font: inherit;
+  background: #fff;
+}
+
+button {
+  border: 0;
+  border-radius: 9px;
+  padding: 10px 15px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.primary {
+  background: #176b87;
+  color: white;
+}
+
+.login-card .primary {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.secondary {
+  background: #eaf0f4;
+  color: #24404c;
+}
+
+.error {
+  background: #fff0f0;
+  color: #b42318;
+  padding: 10px;
+  border-radius: 8px;
+  margin-top: 14px;
+  font-size: 14px;
+}
+
+/* =========================================================
+   APP LAYOUT
+   ========================================================= */
+
+.app-shell {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: 240px 1fr;
+}
+
+aside {
+  background: #102a43;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================================================
+   SIDEBAR BRAND
+   ========================================================= */
+
+.side-brand {
+  display: flex;
+  gap: 11px;
+  align-items: center;
+  font-size: 22px;
+}
+
+/* LOGO PT TSI SMART */
+.side-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.side-brand strong {
+  display: block;
+  font-size: 15px;
+}
+
+.side-brand small {
+  display: block;
+  color: #b9c8d7;
+  font-size: 11px;
+  margin-top: 2px;
+}
+
+/* =========================================================
+   SIDEBAR MENU
+   ========================================================= */
+
+nav {
+  display: grid;
+  gap: 7px;
+  margin-top: 32px;
+}
+
+nav button {
+  background: transparent;
+  color: #d7e1ea;
+  text-align: left;
+}
+
+nav button.active,
+nav button:hover {
+  background: #1c4a68;
+  color: #fff;
+}
+
+.logout {
+  margin-top: auto;
+  background: #183951;
+  color: #dbe8f1;
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.content {
+  min-width: 0;
+}
+
+header {
+  height: 70px;
+  background: #fff;
+  border-bottom: 1px solid #e5eaf0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+}
+
+header strong {
+  display: block;
+}
+
+header span {
+  font-size: 12px;
+  color: #7b8794;
+}
+
+.user-chip {
+  text-align: right;
+  font-weight: 700;
+}
+
+.user-chip small {
+  display: block;
+  color: #7b8794;
+  font-weight: 500;
+  font-size: 11px;
+}
+
+.page {
+  padding: 28px;
+  max-width: 1400px;
+  margin: auto;
+}
+
+/* =========================================================
+   GENERAL
+   ========================================================= */
+
+.title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.title-row h2 {
+  margin: 0 0 4px;
+}
+
+.title-row p {
+  margin: 0;
+  color: #6b7280;
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 20px;
+}
+
+.gas-card,
+.panel {
+  background: #fff;
+  border: 1px solid #e4e9ef;
+  border-radius: 14px;
+  padding: 20px;
+}
+
+.gas-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 800;
+}
+
+.pressure {
+  font-size: 38px;
+  font-weight: 800;
+  margin: 25px 0 8px;
+}
+
+.pressure small {
+  font-size: 15px;
+  color: #667085;
+}
+
+.meta {
+  font-size: 12px;
+  color: #7b8794;
+}
+
+.status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+  background: #eef2f6;
+}
+
+.status.normal {
+  background: #e7f7ee;
+  color: #18794e;
+}
+
+.status.refill {
+  background: #fff5d9;
+  color: #9a6700;
+}
+
+.status.critical {
+  background: #ffe8e8;
+  color: #b42318;
+}
+
+.status.unset {
+  background: #eef2f6;
+  color: #667085;
+}
+
+.panel {
+  margin-bottom: 20px;
+}
+
+.panel h3 {
+  margin-top: 0;
+}
+
+.table-wrap {
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 12px;
+  border-bottom: 1px solid #edf0f4;
+  white-space: nowrap;
+}
+
+th {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.form-panel {
+  max-width: 900px;
+}
+
+.grid-form {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 18px;
+}
+
+.grid-form label {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.wide {
+  grid-column: 1 / -1;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+}
+
+.empty {
+  text-align: center;
+  padding: 30px;
+  color: #8a94a3;
+}
+
+.success-message {
+  background: #e7f7ee;
+  color: #18794e;
+  padding: 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* =========================================================
+   OLD HTML STYLE - MONITORING DASHBOARD
+   ========================================================= */
+
+.old-dashboard {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.old-dashboard-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px;
+}
+
+.old-dashboard-heading h2 {
+  margin: 0;
+  color: #102a43;
+  font-size: 23px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.old-record-count {
+  color: #7b8794;
+  font-size: 12px;
+}
+
+.old-dashboard-error {
+  margin-bottom: 18px;
+}
+
+/* =========================================================
+   GAS CARDS
+   ========================================================= */
+
+.old-dashboard-cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.old-gas-card {
+  position: relative;
+  min-width: 0;
+  min-height: 330px;
+  padding: 22px 18px 18px;
+  background: #ffffff;
+  border: 1px solid #d7dce2;
+  border-radius: 14px;
+  box-shadow: 0 2px 7px rgba(16, 42, 67, 0.07);
+  overflow: hidden;
+}
+
+.old-gas-card.card-refill {
+  border-color: #f2bd16;
+  box-shadow:
+    0 2px 7px rgba(16, 42, 67, 0.07),
+    0 0 0 1px rgba(242, 189, 22, 0.12);
+}
+
+.old-gas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.old-gas-header h3 {
+  margin: 0;
+  color: #102a43;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.old-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 23px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dashboard-critical {
+  background: #ffe1e1;
+  color: #c62828;
+}
+
+.dashboard-refill {
+  background: #fff0bf;
+  color: #b56b00;
+}
+
+.dashboard-normal {
+  background: #dff6e8;
+  color: #198754;
+}
+
+.dashboard-unset {
+  background: #e8ebef;
+  color: #5d6875;
+}
+
+.current-pressure-label {
+  margin-top: 27px;
+  color: #748092;
+  font-size: 11px;
+}
+
+/* =========================================================
+   GAUGE
+   ========================================================= */
+
+.old-gauge {
+  position: relative;
+  width: 100%;
+  max-width: 330px;
+  height: 155px;
+  margin: 0 auto;
+}
+
+.old-gauge-svg {
+  position: absolute;
+  left: 50%;
+  top: 2px;
+  width: 300px;
+  height: 180px;
+  transform: translateX(-50%);
+  overflow: visible;
+}
+
+.gauge-base,
+.gauge-low,
+.gauge-warning,
+.gauge-normal {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 22;
+}
+
+.gauge-base {
+  stroke: #e9edf1;
+}
+
+.gauge-low {
+  stroke: #f14d5a;
+}
+
+.gauge-warning {
+  stroke: #f5ae27;
+}
+
+.gauge-normal {
+  stroke: #35c477;
+}
+
+.gauge-tick {
+  stroke: #d7dde4;
+  stroke-width: 2;
+}
+
+.old-gauge-needle {
+  position: absolute;
+  left: 50%;
+  top: 82px;
+  width: 2px;
+  height: 67px;
+  transform-origin: 50% 100%;
+  transform:
+    translateX(-50%)
+    rotate(var(--needle-angle));
+  z-index: 5;
+}
+
+.old-needle-line {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 4px;
+  height: 65px;
+  transform: translateX(-50%);
+  border-radius: 4px;
+  background: #172033;
+}
+
+.old-needle-point {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 13px;
+  height: 13px;
+  transform: translateX(-50%);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  background: #172033;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+}
+
+.old-gauge-value {
+  position: absolute;
+  left: 50%;
+  top: 79px;
+  transform: translateX(-50%);
+  width: 125px;
+  text-align: center;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.old-gauge-value strong {
+  display: block;
+  color: #102a43;
+  font-size: 25px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.old-gauge-value span {
+  display: block;
+  margin-top: 4px;
+  color: #8a94a3;
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+}
+
+.old-gauge-unit {
+  display: none;
+}
+
+.gauge-legend {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  width: 100%;
+  white-space: nowrap;
+  color: #667085;
+  font-size: 9px;
+}
+
+.gauge-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.legend-dot {
+  width: 9px;
+  height: 9px;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.legend-low {
+  background: #f14d5a;
+}
+
+.legend-warning {
+  background: #f5ae27;
+}
+
+.legend-normal {
+  background: #35c477;
+}
+
+/* =========================================================
+   PRESSURE VALUE
+   ========================================================= */
+
+.old-pressure-number {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  margin-top: 2px;
+  color: #102a43;
+}
+
+.old-pressure-number strong {
+  font-size: 21px;
+  line-height: 1;
+  font-weight: 800;
+}
+
+.old-pressure-number span {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   GAS DETAILS
+   ========================================================= */
+
+.old-gas-details {
+  margin-top: 17px;
+  color: #667085;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.old-gas-details strong {
+  color: #667085;
+  font-weight: 700;
+}
+
+.old-remarks {
+  margin-top: 8px;
+  color: #344054;
+}
+
+.old-remarks strong {
+  color: #102a43;
+}
+
+.old-photo-count {
+  margin-top: 4px;
+  color: #667085;
+}
+
+/* =========================================================
+   RECORDS
+   ========================================================= */
+
+.old-records-panel {
+  padding: 20px;
+  margin-bottom: 20px;
+  background: #ffffff;
+  border: 1px solid #dfe4ea;
+  border-radius: 14px;
+  box-shadow: 0 2px 7px rgba(16, 42, 67, 0.05);
+}
+
+.old-records-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  margin-bottom: 14px;
+}
+
+.old-records-heading h3 {
+  margin: 0;
+  color: #102a43;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.old-refresh-button {
+  padding: 7px 13px;
+  border: 1px solid #d5dce4;
+  border-radius: 8px;
+  background: #f4f7fa;
+  color: #315269;
+  font-size: 11px;
+}
+
+.old-refresh-button:hover:not(:disabled) {
+  background: #e9eef3;
+}
+
+.old-refresh-button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.old-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.old-records-table {
+  width: 100%;
+  min-width: 950px;
+  border-collapse: collapse;
+  font-size: 11px;
+}
+
+.old-records-table th {
+  padding: 10px 9px;
+  border-bottom: 1px solid #dfe4ea;
+  background: #f7f9fb;
+  color: #667085;
+  font-size: 10px;
+  font-weight: 800;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.old-records-table td {
+  padding: 10px 9px;
+  border-bottom: 1px solid #edf0f4;
+  color: #344054;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.old-records-table tbody tr:hover {
+  background: #fbfcfd;
+}
+
+.old-records-table td strong {
+  color: #102a43;
+}
+
+.old-table-status {
+  display: inline-flex;
+  padding: 4px 7px;
+  border-radius: 999px;
+  font-size: 9px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.table-remarks {
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-photo {
+  display: block;
+  margin-top: 3px;
+  color: #7b8794;
+  font-size: 9px;
+}
+
+.old-delete-button {
+  padding: 6px 9px;
+  border: 1px solid #f0cccc;
+  border-radius: 7px;
+  background: #fff5f5;
+  color: #b42318;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.old-delete-button:hover:not(:disabled) {
+  background: #ffe8e8;
+}
+
+.old-delete-button:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.old-empty {
+  padding: 30px;
+  color: #8a94a3;
+  font-size: 12px;
+  text-align: center;
+}
+
+/* =========================================================
+   OLD DASHBOARD RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .old-dashboard-cards {
+    grid-template-columns: 1fr;
+  }
+
+  .old-gas-card {
+    min-height: 325px;
+  }
+}
+
+@media (max-width: 600px) {
+  .old-dashboard-heading {
+    align-items: flex-start;
+  }
+
+  .old-gas-header {
+    align-items: flex-start;
+  }
+
+  .old-status {
+    font-size: 9px;
+  }
+
+  .old-records-panel {
+    padding: 14px;
+  }
+
+  .old-records-heading {
+    align-items: flex-start;
+  }
+
+  .gauge-legend {
+    gap: 8px;
+    font-size: 8px;
+  }
+}
+
+/* =========================================================
+   DASHBOARD - GAS TANK MONITORING
+   Visual based on original HTML dashboard
+   ========================================================= */
+
+.dashboard-page {
+  width: 100%;
+}
+
+.dashboard-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  margin-bottom: 22px;
+}
+
+.dashboard-title-row h2 {
+  margin: 0 0 5px;
+  font-size: 25px;
+  font-weight: 800;
+  color: #172033;
+}
+
+.dashboard-title-row p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+}
+
+.dashboard-record-count {
+  color: #6b7280;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.dashboard-error {
+  margin-bottom: 16px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff0f0;
+  border: 1px solid #fecaca;
+  color: #b42318;
+  font-size: 13px;
+}
+
+.dashboard-loading {
+  padding: 60px 20px;
+  text-align: center;
+  color: #6b7280;
+  background: #fff;
+  border: 1px solid #e5eaf2;
+  border-radius: 16px;
+}
+
+/* =========================================================
+   DASHBOARD GAS CARDS
+   ========================================================= */
+
+.dashboard-gas-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.dashboard-gas-card {
+  position: relative;
+  min-width: 0;
+  padding: 20px;
+  background: #fff;
+  border: 2px solid #e5eaf2;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.dashboard-gas-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.1);
+}
+
+.dashboard-gas-card.normal-card {
+  background: linear-gradient(
+    180deg,
+    #f0fdf4,
+    #ffffff
+  );
+  border-color: #86efac;
+}
+
+.dashboard-gas-card.refill-card {
+  background: linear-gradient(
+    180deg,
+    #fffbeb,
+    #ffffff
+  );
+  border-color: #fcd34d;
+}
+
+.dashboard-gas-card.critical-card {
+  background: linear-gradient(
+    180deg,
+    #fef2f2,
+    #ffffff
+  );
+  border-color: #fca5a5;
+}
+
+.dashboard-gas-card.unset-card {
+  background: #fff;
+  border-color: #d1d5db;
+}
+
+/* =========================================================
+   DASHBOARD STATUS
+   ========================================================= */
+
+.dashboard-gas-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.dashboard-gas-header h3 {
+  margin: 0;
+  color: #172033;
+  font-size: 17px;
+  font-weight: 800;
+}
+
+.dashboard-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 25px;
+  padding: 5px 11px;
+  border-radius: 999px;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.dashboard-status.normal {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.dashboard-status.refill {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.dashboard-status.critical {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.dashboard-status.unset {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+/* =========================================================
+   PRESSURE GAUGE
+   ========================================================= */
+
+.dashboard-muted {
+  color: #6b7280;
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.dashboard-gauge-wrap {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2px 0 0;
+}
+
+.dashboard-gauge {
+  position: relative;
+  width: 250px;
+  height: 145px;
+  overflow: hidden;
+}
+
+.dashboard-gauge svg {
+  width: 250px;
+  height: 142px;
+  display: block;
+}
+
+.dashboard-gauge-value {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  text-align: center;
+  color: #172033;
+  font-size: 27px;
+  font-weight: 800;
+  line-height: 1;
+  pointer-events: none;
+}
+
+.dashboard-gauge-unit {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 5px;
+  text-align: center;
+  color: #6b7280;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.dashboard-gauge-label {
+  font-size: 11px;
+  fill: #64748b;
+}
+
+/* =========================================================
+   PRESSURE VALUE
+   ========================================================= */
+
+.dashboard-main-pressure {
+  margin-top: -1px;
+  color: #172033;
+  text-align: left;
+  font-size: 24px;
+  font-weight: 800;
+}
+
+.dashboard-main-pressure span {
+  margin-left: 5px;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   GAUGE LEGEND
+   ========================================================= */
+
+.dashboard-gauge-legend {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  flex-wrap: wrap;
+  margin: 8px 0 14px;
+  color: #64748b;
+  font-size: 11px;
+}
+
+.dashboard-gauge-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legend-dot {
+  width: 10px;
+  height: 10px;
+  display: inline-block;
+  border-radius: 50%;
+}
+
+.legend-dot.low {
+  background: #ef4444;
+}
+
+.legend-dot.warning {
+  background: #f59e0b;
+}
+
+.legend-dot.normal {
+  background: #22c55e;
+}
+
+/* =========================================================
+   CARD INFORMATION
+   ========================================================= */
+
+.dashboard-info-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 18px;
+  margin-top: 4px;
+}
+
+.dashboard-info-grid > div {
+  min-width: 0;
+}
+
+.dashboard-info-grid span,
+.dashboard-thresholds span {
+  display: block;
+  margin-bottom: 3px;
+  color: #6b7280;
+  font-size: 11px;
+}
+
+.dashboard-info-grid strong,
+.dashboard-thresholds strong {
+  display: block;
+  overflow-wrap: anywhere;
+  color: #172033;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dashboard-thresholds {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+}
+
+.dashboard-remarks {
+  margin-top: 13px;
+  padding-top: 11px;
+  border-top: 1px solid rgba(148, 163, 184, 0.25);
+  color: #334155;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.dashboard-remarks b {
+  color: #172033;
+}
+
+/* =========================================================
+   NO DATA
+   ========================================================= */
+
+.dashboard-no-data {
+  padding: 35px 10px 25px;
+  text-align: center;
+}
+
+.dashboard-no-data-value {
+  margin-bottom: 8px;
+  color: #172033;
+  font-size: 38px;
+  font-weight: 800;
+}
+
+.dashboard-no-data p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+/* =========================================================
+   RECORD PANEL
+   ========================================================= */
+
+.dashboard-record-panel {
+  margin-top: 20px;
+  margin-bottom: 20px;
+  padding: 20px;
+  background: #fff;
+  border: 1px solid #e5eaf2;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.07);
+}
+
+.dashboard-section-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 13px;
+}
+
+.dashboard-section-title h3 {
+  margin: 0 0 4px;
+  color: #172033;
+  font-size: 17px;
+}
+
+.dashboard-section-title p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.dashboard-refresh {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   DASHBOARD TABLE
+   ========================================================= */
+
+.dashboard-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.dashboard-table {
+  width: 100%;
+  min-width: 1050px;
+  border-collapse: collapse;
+}
+
+.dashboard-table th,
+.dashboard-table td {
+  padding: 11px 10px;
+  border-bottom: 1px solid #e5eaf2;
+  text-align: left;
+  vertical-align: middle;
+  font-size: 13px;
+}
+
+.dashboard-table th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* FIX: transition CSS */
+.dashboard-table tbody tr {
+  transition: background 0.15s ease;
+}
+
+.dashboard-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.dashboard-table td {
+  color: #334155;
+}
+
+.dashboard-table td strong {
+  color: #172033;
+}
+
+.dashboard-remarks-cell {
+  max-width: 320px;
+  white-space: normal !important;
+  line-height: 1.45;
+}
+
+.dashboard-photo-count {
+  display: inline-block;
+  margin-left: 8px;
+  color: #2563eb;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dashboard-delete-btn {
+  padding: 6px 9px;
+  border: 1px solid #fecaca;
+  border-radius: 7px;
+  background: #fee2e2;
+  color: #991b1b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dashboard-delete-btn:hover {
+  background: #fecaca;
+}
+
+.dashboard-no-action {
+  color: #94a3b8;
+}
+
+.dashboard-empty {
+  padding: 35px !important;
+  text-align: center !important;
+  color: #6b7280 !important;
+}
+
+/* =========================================================
+   RESPONSIVE DASHBOARD
+   ========================================================= */
+
+@media (max-width: 1050px) {
+  .dashboard-gas-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-gas-card {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 800px) {
+  .app-shell {
+    grid-template-columns: 1fr;
+  }
+
+  aside {
+    position: relative;
+    padding: 12px;
+  }
+
+  nav {
+    display: flex;
+    overflow: auto;
+    margin-top: 12px;
+  }
+
+  nav button {
+    white-space: nowrap;
+  }
+
+  .logout {
+    position: absolute;
+    right: 12px;
+    top: 12px;
+  }
+
+  .cards {
+    grid-template-columns: 1fr;
+  }
+
+  .grid-form {
+    grid-template-columns: 1fr;
+  }
+
+  .wide {
+    grid-column: auto;
+  }
+
+  header {
+    padding: 0 16px;
+  }
+
+  .page {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 700px) {
+  .dashboard-title-row {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .dashboard-gas-card {
+    padding: 16px;
+  }
+
+  .dashboard-info-grid,
+  .dashboard-thresholds {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-section-title {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .dashboard-refresh {
+    width: 100%;
+  }
+
+  .dashboard-gauge {
+    transform: scale(0.92);
+    transform-origin: center top;
+    margin-bottom: -10px;
+  }
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+header {
+  position: relative;
+  height: 70px;
+  background: #fff;
+  border-bottom: 1px solid #e5eaf0;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  padding: 0 28px;
+}
+
+header > div:first-child {
+  flex-shrink: 0;
+}
+
+/* =========================================================
+   HEADER BRAND - LOGO TENGAH
+   ========================================================= */
+
+.header-brand {
+  position: absolute;
+
+  top: 50%;
+  left: 50%;
+
+  transform: translate(-50%, -50%);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  z-index: 2;
+  pointer-events: none;
+}
+
+.tsp-header-logo {
+  display: block;
+
+  width: auto;
+  height: 72px;
+  max-width: 300px;
+
+  object-fit: contain;
+}
+
+/* =========================================================
+   USER CHIP - TETAP DI KANAN
+   ========================================================= */
+
+.user-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+
+  flex-shrink: 0;
+
+  margin-left: auto;
+  text-align: right;
+
+  z-index: 3;
+}
+
+.user-chip strong {
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.user-chip small {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.2;
+  text-transform: lowercase;
+}
