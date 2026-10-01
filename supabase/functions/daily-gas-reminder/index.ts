@@ -8,7 +8,7 @@ import { Resend } from 'npm:resend@6'
  * Daily Gas Reminder Edge Function
  *
  * Schedule:
- * 09:00 WIB = 02:00 UTC
+ * 10:00 WIB = 03:00 UTC
  *
  * Business rules:
  * - Pressure > Refill Threshold  -> no email
@@ -1002,7 +1002,7 @@ function buildEmail(
       <p>
         This reminder will be sent again every day at
         <strong>
-          09:00 WIB
+          10:00 WIB
         </strong>
         while the threshold condition
         remains active and no refill has occurred.
