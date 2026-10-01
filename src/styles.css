@@ -4196,3 +4196,12 @@ header > div:first-child {
   }
 }
 
+.app-copyright {
+  width: 100%;
+  text-align: center;
+  padding: 18px 16px;
+  font-size: 8px;
+  font-weight: 500;
+  color: #64748b;
+  letter-spacing: 0.04em;
+}

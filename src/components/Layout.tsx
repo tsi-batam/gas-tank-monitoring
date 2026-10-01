@@ -129,8 +129,14 @@ export default function Layout({
           {children}
         </div>
 
-      </section>
 
+        <footer className="app-copyright">
+          © 2026 Santonius
+        </footer>
+        
+      </section>
+          
     </div>
   )
 }
+
