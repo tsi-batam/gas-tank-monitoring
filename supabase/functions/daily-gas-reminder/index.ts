@@ -27,30 +27,35 @@ import { Resend } from 'npm:resend@6'
 
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')
 
-const secretKeysRaw = Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}'
+const secretKeysRaw =
+  Deno.env.get('SUPABASE_SECRET_KEYS') ?? '{}'
 
 let secretKeys: Record<string, string> = {}
 
 try {
   secretKeys = JSON.parse(secretKeysRaw) as Record<string, string>
 } catch {
-  throw new Error('SUPABASE_SECRET_KEYS is not valid JSON.')
+  throw new Error(
+    'SUPABASE_SECRET_KEYS is not valid JSON.',
+  )
 }
 
 const SUPABASE_SECRET_KEY =
   secretKeys.default ??
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 
-const RESEND_API_KEY = Deno.env.get('RESEND_API_KEY')
+const RESEND_API_KEY =
+  Deno.env.get('RESEND_API_KEY')
 
 const REMINDER_RECIPIENT =
   Deno.env.get('REMINDER_RECIPIENT') ??
   'santoniushasibuan1@gmail.com'
 
-const REMINDER_RECIPIENTS = REMINDER_RECIPIENT
-  .split(',')
-  .map((email) => email.trim())
-  .filter(Boolean)
+const REMINDER_RECIPIENTS =
+  REMINDER_RECIPIENT
+    .split(',')
+    .map((email) => email.trim())
+    .filter(Boolean)
 
 const EMAIL_FROM =
   Deno.env.get('EMAIL_FROM') ??
@@ -94,7 +99,9 @@ const supabaseAdmin = createClient(
   },
 )
 
-const resend = new Resend(RESEND_API_KEY)
+const resend = new Resend(
+  RESEND_API_KEY,
+)
 
 /* ============================================================
  * TYPES
@@ -103,7 +110,9 @@ const resend = new Resend(RESEND_API_KEY)
 
 type GasType = 'CO₂' | 'Argon'
 
-type ReminderSeverity = 'Refill' | 'Critical'
+type ReminderSeverity =
+  | 'Refill'
+  | 'Critical'
 
 interface InspectionRow {
   id: string
@@ -135,31 +144,31 @@ interface ActiveCycle {
  * ============================================================
  */
 
-/**
- * Returns current date according to Asia/Jakarta.
- *
- * Example:
- * 2026-09-30
- */
 function getJakartaDate(): string {
-  return new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'Asia/Jakarta',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).format(new Date())
+  return new Intl.DateTimeFormat(
+    'en-CA',
+    {
+      timeZone: 'Asia/Jakarta',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    },
+  ).format(new Date())
 }
 
-/**
- * Formats timestamp into Indonesian/Jakarta time.
- */
-function formatJakartaDateTime(value: string): string {
+function formatJakartaDateTime(
+  value: string,
+): string {
   return (
-    new Intl.DateTimeFormat('id-ID', {
-      timeZone: 'Asia/Jakarta',
-      dateStyle: 'medium',
-      timeStyle: 'short',
-    }).format(new Date(value)) + ' WIB'
+    new Intl.DateTimeFormat(
+      'id-ID',
+      {
+        timeZone: 'Asia/Jakarta',
+        dateStyle: 'medium',
+        timeStyle: 'short',
+      },
+    ).format(new Date(value)) +
+    ' WIB'
   )
 }
 
@@ -168,7 +177,9 @@ function formatJakartaDateTime(value: string): string {
  * ============================================================
  */
 
-function escapeHtml(value: unknown): string {
+function escapeHtml(
+  value: unknown,
+): string {
   return String(value ?? '')
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
@@ -177,7 +188,9 @@ function escapeHtml(value: unknown): string {
     .replaceAll("'", '&#039;')
 }
 
-function isRefill(row: InspectionRow): boolean {
+function isRefill(
+  row: InspectionRow,
+): boolean {
   return Number(row.in_kgs ?? 0) > 0
 }
 
@@ -185,16 +198,27 @@ function compareInspectionDate(
   a: InspectionRow,
   b: InspectionRow,
 ): number {
-  const dateA = new Date(a.inspection_date).getTime()
-  const dateB = new Date(b.inspection_date).getTime()
+  const dateA =
+    new Date(
+      a.inspection_date,
+    ).getTime()
+
+  const dateB =
+    new Date(
+      b.inspection_date,
+    ).getTime()
 
   if (dateA !== dateB) {
     return dateA - dateB
   }
 
   return (
-    new Date(a.created_at).getTime() -
-    new Date(b.created_at).getTime()
+    new Date(
+      a.created_at,
+    ).getTime() -
+    new Date(
+      b.created_at,
+    ).getTime()
   )
 }
 
@@ -203,18 +227,14 @@ function compareInspectionDate(
  * ============================================================
  */
 
-/**
- * Get inspection history for all gas types.
- *
- * We intentionally retrieve history instead of only the latest
- * inspection because the business rule depends on the latest
- * refill that starts the active cycle.
- */
-async function getInspectionHistory(): Promise<InspectionRow[]> {
-  const { data, error } = await supabaseAdmin
-    .from('inspections')
-    .select(
-      `
+async function getInspectionHistory(): Promise<
+  InspectionRow[]
+> {
+  const { data, error } =
+    await supabaseAdmin
+      .from('inspections')
+      .select(
+        `
         id,
         inspection_date,
         created_at,
@@ -225,13 +245,19 @@ async function getInspectionHistory(): Promise<InspectionRow[]> {
         inspector_name,
         notes
       `,
-    )
-    .order('inspection_date', {
-      ascending: true,
-    })
-    .order('created_at', {
-      ascending: true,
-    })
+      )
+      .order(
+        'inspection_date',
+        {
+          ascending: true,
+        },
+      )
+      .order(
+        'created_at',
+        {
+          ascending: true,
+        },
+      )
 
   if (error) {
     throw new Error(
@@ -239,7 +265,9 @@ async function getInspectionHistory(): Promise<InspectionRow[]> {
     )
   }
 
-  return (data ?? []) as InspectionRow[]
+  return (
+    data ?? []
+  ) as InspectionRow[]
 }
 
 /* ============================================================
@@ -247,17 +275,20 @@ async function getInspectionHistory(): Promise<InspectionRow[]> {
  * ============================================================
  */
 
-async function getSettings(): Promise<GasSettingRow[]> {
-  const { data, error } = await supabaseAdmin
-    .from('gas_settings')
-    .select(
-      `
+async function getSettings(): Promise<
+  GasSettingRow[]
+> {
+  const { data, error } =
+    await supabaseAdmin
+      .from('gas_settings')
+      .select(
+        `
         gas_type,
         pressure_unit,
         refill_threshold,
         critical_threshold
       `,
-    )
+      )
 
   if (error) {
     throw new Error(
@@ -265,7 +296,9 @@ async function getSettings(): Promise<GasSettingRow[]> {
     )
   }
 
-  return (data ?? []) as GasSettingRow[]
+  return (
+    data ?? []
+  ) as GasSettingRow[]
 }
 
 /* ============================================================
@@ -273,64 +306,66 @@ async function getSettings(): Promise<GasSettingRow[]> {
  * ============================================================
  */
 
-/**
- * Determines the active cycle for each gas.
- *
- * Rules:
- *
- * No refill yet:
- *   latest inspection = active inspection
- *
- * Refill exists:
- *   latest inspection with in_kgs > 0 becomes the beginning
- *   of the current cycle.
- *
- * Any inspection after that refill belongs to the new cycle.
- *
- * Example:
- *
- * 01 Jan  -> 100 mmWC / 0 KGS
- * 05 Jan  -> 20 KGS refill / 120 mmWC
- * 07 Jan  -> 0 KGS / 80 mmWC
- * 09 Jan  -> 0 KGS / 60 mmWC
- *
- * Active cycle starts at 05 Jan.
- * Latest active inspection = 09 Jan.
- */
 function getActiveCycles(
   inspections: InspectionRow[],
 ): ActiveCycle[] {
-  const grouped = new Map<GasType, InspectionRow[]>()
+  const grouped =
+    new Map<
+      GasType,
+      InspectionRow[]
+    >()
 
   for (const inspection of inspections) {
-    const existing = grouped.get(inspection.gas_type)
+    const existing =
+      grouped.get(
+        inspection.gas_type,
+      )
 
     if (existing) {
-      existing.push(inspection)
+      existing.push(
+        inspection,
+      )
     } else {
-      grouped.set(inspection.gas_type, [inspection])
+      grouped.set(
+        inspection.gas_type,
+        [inspection],
+      )
     }
   }
 
   const cycles: ActiveCycle[] = []
 
-  for (const [gasType, rows] of grouped.entries()) {
-    rows.sort(compareInspectionDate)
+  for (
+    const [
+      gasType,
+      rows,
+    ] of grouped.entries()
+  ) {
+    rows.sort(
+      compareInspectionDate,
+    )
 
-    const refillRows = rows.filter(isRefill)
+    const refillRows =
+      rows.filter(isRefill)
 
     const latestRefill =
       refillRows.length > 0
-        ? refillRows[refillRows.length - 1]
+        ? refillRows[
+            refillRows.length - 1
+          ]
         : null
 
     let activeRows: InspectionRow[]
 
     if (latestRefill) {
-      activeRows = rows.filter(
-        (row) =>
-          compareInspectionDate(row, latestRefill) >= 0,
-      )
+      activeRows =
+        rows.filter(
+          (row) =>
+            compareInspectionDate(
+              row,
+              latestRefill,
+            ) >= 0,
+        )
     } else {
       activeRows = rows
     }
@@ -340,11 +375,14 @@ function getActiveCycles(
     }
 
     const latestInspection =
-      activeRows[activeRows.length - 1]
+      activeRows[
+        activeRows.length - 1
+      ]
 
     cycles.push({
       gasType,
-      refillInspection: latestRefill,
+      refillInspection:
+        latestRefill,
       latestInspection,
     })
   }
@@ -390,46 +428,293 @@ function buildEmail(
   criticalThreshold: number,
   severity: ReminderSeverity,
 ) {
-  const isCritical = severity === 'Critical'
+  const isCritical =
+    severity === 'Critical'
 
-  const statusText = isCritical
-    ? 'CRITICAL'
-    : 'REFILL REQUIRED'
+  const statusText =
+    isCritical
+      ? 'CRITICAL'
+      : 'REFILL REQUIRED'
 
-  const subject = isCritical
-    ? `[URGENT] CRITICAL GAS PRESSURE - ${row.gas_type} ${row.pressure} ${row.pressure_unit}`
-    : `[REFILL REQUIRED] Gas Tank ${row.gas_type} - ${row.pressure} ${row.pressure_unit}`
+  const subject =
+    isCritical
+      ? `[URGENT] CRITICAL GAS PRESSURE - ${row.gas_type} ${row.pressure} ${row.pressure_unit}`
+      : `[REFILL REQUIRED] Gas Tank ${row.gas_type} - ${row.pressure} ${row.pressure_unit}`
 
-  const title = isCritical
-    ? 'CRITICAL GAS PRESSURE'
-    : 'REFILL REQUIRED'
+  const title =
+    isCritical
+      ? 'CRITICAL GAS PRESSURE'
+      : 'REFILL REQUIRED'
 
-  const intro = isCritical
-    ? `
-      <strong>URGENT - CRITICAL CONDITION</strong>
+  /* ==========================================================
+   * ALARM COLORS
+   * ==========================================================
+   */
+
+  const alarmColor =
+    '#dc2626'
+
+  const alarmBackground =
+    '#fee2e2'
+
+  /* ==========================================================
+   * ALARM INTRODUCTION
+   * ==========================================================
+   */
+
+  const intro =
+    isCritical
+      ? `
+      <strong style="
+        color:${alarmColor};
+      ">
+        URGENT - CRITICAL CONDITION
+      </strong>
+
       <br><br>
-      The Gas Tank Monitoring System has detected that the gas pressure
-      has reached or fallen below
-      <strong>Critical Threshold</strong>.
+
+      <span style="
+        color:${alarmColor};
+      ">
+        The Gas Tank Monitoring System has detected that the gas pressure
+        has reached or fallen below
+        <strong>Critical Threshold</strong>.
+      </span>
     `
-    : `
-      <strong>REFILL REQUIRED</strong>
+      : `
+      <strong style="
+        color:${alarmColor};
+      ">
+        REFILL REQUIRED
+      </strong>
+
       <br><br>
-      The Gas Tank Monitoring System has detected that the gas pressure
-      has reached or fallen below
-      <strong>Refill Threshold</strong>.
+
+      <span style="
+        color:${alarmColor};
+      ">
+        The Gas Tank Monitoring System has detected that the gas pressure
+        has reached or fallen below
+        <strong>Refill Threshold</strong>.
+      </span>
     `
 
-  const actionText = isCritical
-    ? 'Please check the gas tank condition immediately and take the necessary action according to the company safety procedures.'
-    : 'Please check the gas tank condition and refill the gas according to the company procedures.'
+  /* ==========================================================
+   * ACTION TEXT
+   * ==========================================================
+   */
+
+  const actionText =
+    isCritical
+      ? 'Please check the gas tank condition immediately and take the necessary action according to the company safety procedures.'
+      : 'Please check the gas tank condition and refill the gas according to the company procedures.'
+
+  /* ==========================================================
+   * REFILL THRESHOLD ROW
+   * ==========================================================
+   */
+
+  const refillThresholdRow =
+    isCritical
+      ? `
+        <tr>
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              Refill Threshold
+            </strong>
+          </td>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            ${escapeHtml(
+              refillThreshold,
+            )}
+            ${escapeHtml(
+              row.pressure_unit,
+            )}
+          </td>
+        </tr>
+      `
+      : `
+        <tr>
+          <td style="
+            border:1px solid ${alarmColor};
+            background:${alarmBackground};
+            color:${alarmColor};
+          ">
+            <strong>
+              Refill Threshold
+            </strong>
+          </td>
+
+          <td style="
+            border:1px solid ${alarmColor};
+            background:${alarmBackground};
+            color:${alarmColor};
+          ">
+            <strong>
+              ${escapeHtml(
+                refillThreshold,
+              )}
+              ${escapeHtml(
+                row.pressure_unit,
+              )}
+            </strong>
+          </td>
+        </tr>
+      `
+
+  /* ==========================================================
+   * CRITICAL THRESHOLD ROW
+   * ==========================================================
+   */
+
+  const criticalThresholdRow =
+    isCritical
+      ? `
+        <tr>
+          <td style="
+            border:1px solid ${alarmColor};
+            background:${alarmBackground};
+            color:${alarmColor};
+          ">
+            <strong>
+              Critical Threshold
+            </strong>
+          </td>
+
+          <td style="
+            border:1px solid ${alarmColor};
+            background:${alarmBackground};
+            color:${alarmColor};
+          ">
+            <strong>
+              ${escapeHtml(
+                criticalThreshold,
+              )}
+              ${escapeHtml(
+                row.pressure_unit,
+              )}
+            </strong>
+          </td>
+        </tr>
+      `
+      : `
+        <tr>
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              Critical Threshold
+            </strong>
+          </td>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            ${escapeHtml(
+              criticalThreshold,
+            )}
+            ${escapeHtml(
+              row.pressure_unit,
+            )}
+          </td>
+        </tr>
+      `
+
+  /* ==========================================================
+   * SYSTEM ACCESS
+   * ==========================================================
+   */
+
+  const systemAccess = `
+    <div style="
+      margin:25px 0;
+      padding:20px;
+      background:#f8fafc;
+      border:1px solid #e1e5ea;
+      border-radius:8px;
+    ">
+
+      <h3 style="
+        margin:0 0 14px 0;
+        color:#172033;
+        font-size:17px;
+      ">
+        System Access
+      </h3>
+
+      <p style="
+        margin:0 0 14px 0;
+        color:#172033;
+      ">
+        To check the inspection data,
+        please visit the link below.
+      </p>
+
+      <p style="
+        margin:0 0 14px 0;
+      ">
+        <strong>
+          Gas Tank Monitoring System
+        </strong>
+      </p>
+
+      <p style="
+        margin:6px 0;
+      ">
+        <strong>
+          Username:
+        </strong>
+        tsp
+      </p>
+
+      <p style="
+        margin:6px 0 18px 0;
+      ">
+        <strong>
+          Password:
+        </strong>
+        tsp08112023
+      </p>
+
+      <a
+        href="https://gas-tank-monitoring.vercel.app/"
+        target="_blank"
+        style="
+          display:inline-block;
+          padding:10px 18px;
+          background:#172033;
+          color:#ffffff;
+          text-decoration:none;
+          border-radius:6px;
+          font-weight:bold;
+        "
+      >
+        Open Gas Tank Monitoring System
+      </a>
+
+    </div>
+  `
+
+  /* ==========================================================
+   * EMAIL HTML
+   * ==========================================================
+   */
 
   const html = `
 <!DOCTYPE html>
-<html lang="id">
+<html lang="en">
+
 <head>
   <meta charset="UTF-8">
-  <title>${escapeHtml(title)}</title>
+
+  <title>
+    ${escapeHtml(title)}
+  </title>
 </head>
 
 <body style="
@@ -449,14 +734,20 @@ function buildEmail(
     border:1px solid #e1e5ea;
   ">
 
+    <!-- =====================================================
+         HEADER
+         ===================================================== -->
+
     <div style="
       padding:22px 24px;
       background:#172033;
       color:#ffffff;
     ">
+
       <h2 style="
         margin:0;
         font-size:22px;
+        color:${alarmColor};
       ">
         ${escapeHtml(title)}
       </h2>
@@ -467,16 +758,29 @@ function buildEmail(
       ">
         TSI SMART PRODUCTS
       </p>
+
     </div>
+
+
+    <!-- =====================================================
+         CONTENT
+         ===================================================== -->
 
     <div style="
       padding:24px;
       line-height:1.6;
     ">
 
+      <!-- Alarm explanation -->
+
       <p>
         ${intro}
       </p>
+
+
+      <!-- ===================================================
+           INSPECTION INFORMATION TABLE
+           =================================================== -->
 
       <table
         cellpadding="10"
@@ -489,111 +793,236 @@ function buildEmail(
         "
       >
 
-        <tr>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>Gas</strong>
-          </td>
-          <td style="border:1px solid #dfe3e8;">
-            ${escapeHtml(row.gas_type)}
-          </td>
-        </tr>
+        <!-- Gas -->
 
         <tr>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>Current Pressure</strong>
-          </td>
-          <td style="border:1px solid #dfe3e8;">
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
             <strong>
-              ${escapeHtml(row.pressure)}
-              ${escapeHtml(row.pressure_unit)}
+              Gas
             </strong>
           </td>
-        </tr>
 
-        <tr>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>Refill Threshold</strong>
-          </td>
-          <td style="border:1px solid #dfe3e8;">
-            ${escapeHtml(refillThreshold)}
-            ${escapeHtml(row.pressure_unit)}
-          </td>
-        </tr>
-
-        <tr>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>Critical Threshold</strong>
-          </td>
-          <td style="border:1px solid #dfe3e8;">
-            ${escapeHtml(criticalThreshold)}
-            ${escapeHtml(row.pressure_unit)}
-          </td>
-        </tr>
-
-        <tr>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>Status</strong>
-          </td>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>${escapeHtml(statusText)}</strong>
-          </td>
-        </tr>
-
-        <tr>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>Checked By</strong>
-          </td>
-          <td style="border:1px solid #dfe3e8;">
-            ${escapeHtml(row.inspector_name)}
-          </td>
-        </tr>
-
-        <tr>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>Inspection Time</strong>
-          </td>
-          <td style="border:1px solid #dfe3e8;">
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
             ${escapeHtml(
-              formatJakartaDateTime(row.inspection_date),
+              row.gas_type,
             )}
           </td>
+
         </tr>
 
-        <tr>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>In Quantity</strong>
-          </td>
-          <td style="border:1px solid #dfe3e8;">
-            ${escapeHtml(row.in_kgs ?? 0)} KGS
-          </td>
-        </tr>
+
+        <!-- Current Pressure -->
 
         <tr>
-          <td style="border:1px solid #dfe3e8;">
-            <strong>Remarks</strong>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              Current Pressure
+            </strong>
           </td>
-          <td style="border:1px solid #dfe3e8;">
-            ${escapeHtml(row.notes || '-')}
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              ${escapeHtml(
+                row.pressure,
+              )}
+              ${escapeHtml(
+                row.pressure_unit,
+              )}
+            </strong>
           </td>
+
+        </tr>
+
+
+        <!-- Refill Threshold -->
+
+        ${refillThresholdRow}
+
+
+        <!-- Critical Threshold -->
+
+        ${criticalThresholdRow}
+
+
+        <!-- Status -->
+
+        <tr>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              Status
+            </strong>
+          </td>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              ${escapeHtml(
+                statusText,
+              )}
+            </strong>
+          </td>
+
+        </tr>
+
+
+        <!-- Checked By -->
+
+        <tr>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              Checked By
+            </strong>
+          </td>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            ${escapeHtml(
+              row.inspector_name,
+            )}
+          </td>
+
+        </tr>
+
+
+        <!-- Inspection Time -->
+
+        <tr>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              Inspection Time
+            </strong>
+          </td>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            ${escapeHtml(
+              formatJakartaDateTime(
+                row.inspection_date,
+              ),
+            )}
+          </td>
+
+        </tr>
+
+
+        <!-- In Quantity -->
+
+        <tr>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              In Quantity
+            </strong>
+          </td>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            ${escapeHtml(
+              row.in_kgs ?? 0,
+            )} KGS
+          </td>
+
+        </tr>
+
+
+        <!-- Remarks -->
+
+        <tr>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            <strong>
+              Remarks
+            </strong>
+          </td>
+
+          <td style="
+            border:1px solid #dfe3e8;
+          ">
+            ${escapeHtml(
+              row.notes || '-',
+            )}
+          </td>
+
         </tr>
 
       </table>
 
+
+      <!-- ===================================================
+           ACTION
+           =================================================== -->
+
       <p>
-        <strong>${escapeHtml(actionText)}</strong>
+        <strong>
+          ${escapeHtml(
+            actionText,
+          )}
+        </strong>
       </p>
+
+
+      <!-- ===================================================
+           SYSTEM ACCESS
+           =================================================== -->
+
+      ${systemAccess}
+
+
+      <!-- ===================================================
+           DAILY REMINDER INFORMATION
+           =================================================== -->
 
       <p>
         This reminder will be sent again every day at
-        <strong>09:00 WIB</strong> while the threshold condition
+        <strong>
+          09:00 WIB
+        </strong>
+        while the threshold condition
         remains active and no refill has occurred.
       </p>
+
+
+      <!-- ===================================================
+           FOOTER SEPARATOR
+           =================================================== -->
 
       <hr style="
         border:0;
         border-top:1px solid #e1e5ea;
         margin:25px 0;
       ">
+
+
+      <!-- ===================================================
+           FOOTER
+           =================================================== -->
 
       <p style="
         margin:0;
@@ -609,6 +1038,7 @@ function buildEmail(
   </div>
 
 </body>
+
 </html>
 `
 
@@ -623,27 +1053,27 @@ function buildEmail(
  * ============================================================
  */
 
-/**
- * Only one reminder per:
- *
- * gas_type
- * + reminder_date
- * + recipient
- *
- * This prevents duplicate email when multiple inspections
- * exist on the same day.
- */
 async function hasReminderBeenSent(
   gasType: GasType,
   reminderDate: string,
 ): Promise<boolean> {
-  const { data, error } = await supabaseAdmin
-    .from('gas_email_reminder_logs')
-    .select('id')
-    .eq('gas_type', gasType)
-    .eq('reminder_date', reminderDate)
-    .eq('recipient_email', REMINDER_RECIPIENT)
-    .limit(1)
+  const { data, error } =
+    await supabaseAdmin
+      .from('gas_email_reminder_logs')
+      .select('id')
+      .eq(
+        'gas_type',
+        gasType,
+      )
+      .eq(
+        'reminder_date',
+        reminderDate,
+      )
+      .eq(
+        'recipient_email',
+        REMINDER_RECIPIENT,
+      )
+      .limit(1)
 
   if (error) {
     throw new Error(
@@ -651,7 +1081,10 @@ async function hasReminderBeenSent(
     )
   }
 
-  return Boolean(data && data.length > 0)
+  return Boolean(
+    data &&
+    data.length > 0,
+  )
 }
 
 /* ============================================================
@@ -659,298 +1092,322 @@ async function hasReminderBeenSent(
  * ============================================================
  */
 
-Deno.serve(async (req) => {
-  if (req.method !== 'POST') {
-    return Response.json(
-      {
-        ok: false,
-        error: 'Method not allowed. Use POST.',
-      },
-      {
-        status: 405,
-      },
-    )
-  }
-
-  /**
-   * The function is intentionally protected with the
-   * Supabase secret key.
-   *
-   * The key must NEVER be placed in VITE_* variables.
-   */
-  const providedKey =
-    req.headers.get('apikey') ?? ''
-
-  if (
-    !providedKey ||
-    providedKey !== SUPABASE_SECRET_KEY
-  ) {
-    return Response.json(
-      {
-        ok: false,
-        error: 'Unauthorized.',
-      },
-      {
-        status: 401,
-      },
-    )
-  }
-
-  try {
-    const reminderDate = getJakartaDate()
-
-    const [
-      inspections,
-      settings,
-    ] = await Promise.all([
-      getInspectionHistory(),
-      getSettings(),
-    ])
-
-    const activeCycles =
-      getActiveCycles(inspections)
-
-    const results: Array<
-      Record<string, unknown>
-    > = []
-
-    for (const cycle of activeCycles) {
-      const row = cycle.latestInspection
-
-      /**
-       * Safety:
-       *
-       * The active cycle starts from the latest refill.
-       * The latest inspection may itself be the refill.
-       *
-       * If the latest inspection contains KGS > 0,
-       * there is no reminder to send at this moment.
-       */
-      if (isRefill(row)) {
-        results.push({
-          gas_type: cycle.gasType,
-          action: 'skip_refill',
-          inspection_id: row.id,
-          pressure: row.pressure,
-          pressure_unit: row.pressure_unit,
-          in_kgs: row.in_kgs,
-        })
-
-        continue
-      }
-
-      /**
-       * Find settings matching the exact gas + pressure unit.
-       */
-      const setting = settings.find(
-        (item) =>
-          item.gas_type === row.gas_type &&
-          item.pressure_unit === row.pressure_unit,
+Deno.serve(
+  async (req) => {
+    if (req.method !== 'POST') {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            'Method not allowed. Use POST.',
+        },
+        {
+          status: 405,
+        },
       )
-
-      if (!setting) {
-        results.push({
-          gas_type: cycle.gasType,
-          action: 'skip_no_setting',
-          pressure_unit: row.pressure_unit,
-          inspection_id: row.id,
-        })
-
-        continue
-      }
-
-      const refillThreshold =
-        setting.refill_threshold === null
-          ? null
-          : Number(setting.refill_threshold)
-
-      const criticalThreshold =
-        setting.critical_threshold === null
-          ? null
-          : Number(setting.critical_threshold)
-
-      /**
-       * Do not send if thresholds are not configured.
-       */
-      if (
-        refillThreshold === null ||
-        criticalThreshold === null
-      ) {
-        results.push({
-          gas_type: cycle.gasType,
-          action: 'skip_unconfigured',
-          inspection_id: row.id,
-          pressure_unit: row.pressure_unit,
-        })
-
-        continue
-      }
-
-      /**
-       * Validate threshold ordering.
-       *
-       * Critical must be <= Refill.
-       */
-      if (
-        criticalThreshold >
-        refillThreshold
-      ) {
-        results.push({
-          gas_type: cycle.gasType,
-          action: 'skip_invalid_threshold',
-          refill_threshold: refillThreshold,
-          critical_threshold: criticalThreshold,
-        })
-
-        continue
-      }
-
-      const severity = getSeverity(
-        Number(row.pressure),
-        refillThreshold,
-        criticalThreshold,
-      )
-
-      /**
-       * Pressure is above the refill threshold.
-       */
-      if (!severity) {
-        results.push({
-          gas_type: cycle.gasType,
-          action: 'skip_normal',
-          inspection_id: row.id,
-          pressure: row.pressure,
-          pressure_unit: row.pressure_unit,
-        })
-
-        continue
-      }
-
-      /**
-       * Prevent multiple reminders for the same gas
-       * on the same Jakarta calendar day.
-       */
-      const alreadySent =
-        await hasReminderBeenSent(
-          cycle.gasType,
-          reminderDate,
-        )
-
-      if (alreadySent) {
-        results.push({
-          gas_type: cycle.gasType,
-          action: 'skip_already_sent_today',
-          severity,
-          inspection_id: row.id,
-          reminder_date: reminderDate,
-        })
-
-        continue
-      }
-
-      /**
-       * Build email.
-       */
-      const email = buildEmail(
-        row,
-        refillThreshold,
-        criticalThreshold,
-        severity,
-      )
-
-      /**
-       * Send email using Resend.
-       */
-      const {
-        data: sent,
-        error: sendError,
-      } = await resend.emails.send({
-        from: EMAIL_FROM,
-        to: REMINDER_RECIPIENTS,
-        subject: email.subject,
-        html: email.html,
-      })
-
-      if (sendError) {
-        throw new Error(
-          `Resend error for ${row.gas_type}: ${sendError.message}`,
-        )
-      }
-
-      /**
-       * Save reminder log.
-       *
-       * The database migration should have a unique constraint
-       * that prevents duplicate daily reminders.
-       */
-      const {
-        error: logError,
-      } = await supabaseAdmin
-        .from('gas_email_reminder_logs')
-        .insert({
-          inspection_id: row.id,
-          gas_type: row.gas_type,
-          reminder_date: reminderDate,
-          severity,
-          recipient_email:
-            REMINDER_RECIPIENT,
-          provider_message_id:
-            sent?.id ?? null,
-        })
-
-      /**
-       * PostgreSQL duplicate key.
-       *
-       * This can happen if two function invocations run
-       * at nearly the same time.
-       */
-      if (
-        logError &&
-        logError.code !== '23505'
-      ) {
-        throw new Error(
-          `Failed to save reminder log: ${logError.message}`,
-        )
-      }
-
-      results.push({
-        gas_type: cycle.gasType,
-        action: logError
-          ? 'sent_but_duplicate_log'
-          : 'sent',
-        severity,
-        inspection_id: row.id,
-        pressure: row.pressure,
-        pressure_unit: row.pressure_unit,
-        message_id: sent?.id ?? null,
-        reminder_date: reminderDate,
-      })
     }
 
-    return Response.json({
-      ok: true,
-      reminder_date: reminderDate,
-      recipient: REMINDER_RECIPIENTS,
-      processed_gases: activeCycles.length,
-      results,
-    })
-  } catch (error) {
-    console.error(
-      'Daily gas reminder error:',
-      error,
-    )
+    const providedKey =
+      req.headers.get(
+        'apikey',
+      ) ?? ''
 
-    return Response.json(
-      {
-        ok: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : 'Unknown error',
-      },
-      {
-        status: 500,
-      },
-    )
-  }
-})
+    if (
+      !providedKey ||
+      providedKey !==
+        SUPABASE_SECRET_KEY
+    ) {
+      return Response.json(
+        {
+          ok: false,
+          error:
+            'Unauthorized.',
+        },
+        {
+          status: 401,
+        },
+      )
+    }
+
+    try {
+      const reminderDate =
+        getJakartaDate()
+
+      const [
+        inspections,
+        settings,
+      ] = await Promise.all([
+        getInspectionHistory(),
+        getSettings(),
+      ])
+
+      const activeCycles =
+        getActiveCycles(
+          inspections,
+        )
+
+      const results: Array<
+        Record<string, unknown>
+      > = []
+
+      for (
+        const cycle of activeCycles
+      ) {
+        const row =
+          cycle.latestInspection
+
+        if (isRefill(row)) {
+          results.push({
+            gas_type:
+              cycle.gasType,
+            action:
+              'skip_refill',
+            inspection_id:
+              row.id,
+            pressure:
+              row.pressure,
+            pressure_unit:
+              row.pressure_unit,
+            in_kgs:
+              row.in_kgs,
+          })
+
+          continue
+        }
+
+        const setting =
+          settings.find(
+            (item) =>
+              item.gas_type ===
+                row.gas_type &&
+              item.pressure_unit ===
+                row.pressure_unit,
+          )
+
+        if (!setting) {
+          results.push({
+            gas_type:
+              cycle.gasType,
+            action:
+              'skip_no_setting',
+            pressure_unit:
+              row.pressure_unit,
+            inspection_id:
+              row.id,
+          })
+
+          continue
+        }
+
+        const refillThreshold =
+          setting.refill_threshold ===
+          null
+            ? null
+            : Number(
+                setting.refill_threshold,
+              )
+
+        const criticalThreshold =
+          setting.critical_threshold ===
+          null
+            ? null
+            : Number(
+                setting.critical_threshold,
+              )
+
+        if (
+          refillThreshold ===
+            null ||
+          criticalThreshold ===
+            null
+        ) {
+          results.push({
+            gas_type:
+              cycle.gasType,
+            action:
+              'skip_unconfigured',
+            inspection_id:
+              row.id,
+            pressure_unit:
+              row.pressure_unit,
+          })
+
+          continue
+        }
+
+        if (
+          criticalThreshold >
+          refillThreshold
+        ) {
+          results.push({
+            gas_type:
+              cycle.gasType,
+            action:
+              'skip_invalid_threshold',
+            refill_threshold:
+              refillThreshold,
+            critical_threshold:
+              criticalThreshold,
+          })
+
+          continue
+        }
+
+        const severity =
+          getSeverity(
+            Number(row.pressure),
+            refillThreshold,
+            criticalThreshold,
+          )
+
+        if (!severity) {
+          results.push({
+            gas_type:
+              cycle.gasType,
+            action:
+              'skip_normal',
+            inspection_id:
+              row.id,
+            pressure:
+              row.pressure,
+            pressure_unit:
+              row.pressure_unit,
+          })
+
+          continue
+        }
+
+        const alreadySent =
+          await hasReminderBeenSent(
+            cycle.gasType,
+            reminderDate,
+          )
+
+        if (alreadySent) {
+          results.push({
+            gas_type:
+              cycle.gasType,
+            action:
+              'skip_already_sent_today',
+            severity,
+            inspection_id:
+              row.id,
+            reminder_date:
+              reminderDate,
+          })
+
+          continue
+        }
+
+        const email =
+          buildEmail(
+            row,
+            refillThreshold,
+            criticalThreshold,
+            severity,
+          )
+
+        const {
+          data: sent,
+          error: sendError,
+        } =
+          await resend.emails.send(
+            {
+              from: EMAIL_FROM,
+              to:
+                REMINDER_RECIPIENTS,
+              subject:
+                email.subject,
+              html:
+                email.html,
+            },
+          )
+
+        if (sendError) {
+          throw new Error(
+            `Resend error for ${row.gas_type}: ${sendError.message}`,
+          )
+        }
+
+        const {
+          error: logError,
+        } =
+          await supabaseAdmin
+            .from(
+              'gas_email_reminder_logs',
+            )
+            .insert({
+              inspection_id:
+                row.id,
+              gas_type:
+                row.gas_type,
+              reminder_date:
+                reminderDate,
+              severity,
+              recipient_email:
+                REMINDER_RECIPIENT,
+              provider_message_id:
+                sent?.id ?? null,
+            })
+
+        if (
+          logError &&
+          logError.code !==
+            '23505'
+        ) {
+          throw new Error(
+            `Failed to save reminder log: ${logError.message}`,
+          )
+        }
+
+        results.push({
+          gas_type:
+            cycle.gasType,
+          action: logError
+            ? 'sent_but_duplicate_log'
+            : 'sent',
+          severity,
+          inspection_id:
+            row.id,
+          pressure:
+            row.pressure,
+          pressure_unit:
+            row.pressure_unit,
+          message_id:
+            sent?.id ?? null,
+          reminder_date:
+            reminderDate,
+        })
+      }
+
+      return Response.json({
+        ok: true,
+        reminder_date:
+          reminderDate,
+        recipient:
+          REMINDER_RECIPIENTS,
+        processed_gases:
+          activeCycles.length,
+        results,
+      })
+    } catch (error) {
+      console.error(
+        'Daily gas reminder error:',
+        error,
+      )
+
+      return Response.json(
+        {
+          ok: false,
+          error:
+            error instanceof Error
+              ? error.message
+              : 'Unknown error',
+        },
+        {
+          status: 500,
+        },
+      )
+    }
+  },
+)

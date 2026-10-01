@@ -5,6 +5,7 @@ import {
   getInspections,
   getSettings,
 } from '../services/inspection'
+import { createPhotoUrl } from '../services/storage'
 import { useAuth } from '../contexts/AuthContext'
 import type {
   GasSetting,
@@ -277,9 +278,9 @@ export default function Dashboard() {
 
   const [rows, setRows] = useState<Inspection[]>([])
   const [settings, setSettings] = useState<GasSetting[]>([])
-  const [photoCounts, setPhotoCounts] = useState<
-    Record<string, number>
-  >({})
+  const [photoCounts, setPhotoCounts] = useState<Record<string, number>>({})
+  const [photoUrls, setPhotoUrls] = useState<Record<string, string[]>>({})
+  const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [refreshing, setRefreshing] = useState(false)
@@ -306,15 +307,39 @@ export default function Dashboard() {
         )
 
         const counts: Record<string, number> = {}
+        const urls: Record<string, string[]> = {}
 
         for (const photo of photos) {
           counts[photo.inspection_id] =
             (counts[photo.inspection_id] ?? 0) + 1
         }
 
+        await Promise.all(
+          photos.map(async (photo) => {
+            try {
+              const signedUrl = await createPhotoUrl(
+                photo.storage_path,
+              )
+
+              if (!urls[photo.inspection_id]) {
+                urls[photo.inspection_id] = []
+              }
+
+              urls[photo.inspection_id].push(signedUrl)
+            } catch (photoError) {
+              console.error(
+                `Gagal membuat URL foto ${photo.storage_path}:`,
+                photoError,
+              )
+            }
+          }),
+        )
+
         setPhotoCounts(counts)
+        setPhotoUrls(urls)
       } else {
         setPhotoCounts({})
+        setPhotoUrls({})
       }
     } catch (err) {
       if (
@@ -635,6 +660,33 @@ export default function Dashboard() {
                     </div>
                   )}
 
+                  {(photoUrls[inspection.id]?.length ?? 0) > 0 && (
+                    <div className="dashboard-photo-section">
+                      <span className="dashboard-photo-label">
+                        Photo Evidence
+                      </span>
+
+                      <div className="dashboard-photo-list">
+                        {photoUrls[inspection.id].map((url, index) => (
+                          <button
+                            key={`${inspection.id}-photo-${index}`}
+                            type="button"
+                            className="dashboard-photo-thumb-button"
+                            onClick={() => setSelectedPhoto(url)}
+                            aria-label={`Lihat foto evidence ${index + 1}`}
+                          >
+                            <img
+                              src={url}
+                              alt={`Photo evidence ${index + 1}`}
+                              className="dashboard-photo-thumb"
+                              loading="lazy"
+                            />
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                 </>
               ) : (
                 <div className="dashboard-no-data">
@@ -774,12 +826,30 @@ export default function Dashboard() {
                       </td>
 
                       <td className="dashboard-remarks-cell">
-                        {row.notes || '—'}
+                        <div>{row.notes || '—'}</div>
 
                         {photoCount > 0 && (
-                          <span className="dashboard-photo-count">
-                            📷 {photoCount}
-                          </span>
+                          <div className="dashboard-table-photo-list">
+                            {photoUrls[row.id]?.map((url, index) => (
+                              <button
+                                key={`${row.id}-table-photo-${index}`}
+                                type="button"
+                                className="dashboard-table-photo-button"
+                                onClick={() => setSelectedPhoto(url)}
+                                aria-label={`Lihat foto evidence ${index + 1}`}
+                              >
+                                <img
+                                  src={url}
+                                  alt={`Photo evidence ${index + 1}`}
+                                  className="dashboard-table-photo"
+                                  loading="lazy"
+                                />
+                              </button>
+                            ))}
+                            <span className="dashboard-photo-count">
+                              📷 {photoCount}
+                            </span>
+                          </div>
                         )}
                       </td>
 
@@ -815,6 +885,32 @@ export default function Dashboard() {
         </div>
 
       </section>
+
+      {selectedPhoto && (
+        <div
+          className="dashboard-photo-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Photo evidence"
+          onClick={() => setSelectedPhoto(null)}
+        >
+          <button
+            type="button"
+            className="dashboard-photo-modal-close"
+            onClick={() => setSelectedPhoto(null)}
+            aria-label="Tutup foto"
+          >
+            ×
+          </button>
+
+          <img
+            src={selectedPhoto}
+            alt="Photo evidence"
+            className="dashboard-photo-modal-image"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
 
     </div>
   )
