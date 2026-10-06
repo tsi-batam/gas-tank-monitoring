@@ -124,3 +124,4 @@ using (
     bucket_id = 'inspection-images'
     and public.is_admin()
 );
+

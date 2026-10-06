@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { useAuth } from '../contexts/AuthContext'
-import logo from '../assets/1.jpg'
+import logo from '../assets/3.jpg'
 import tspLogo from '../assets/2.png'
 
 export default function Layout({
