@@ -49,7 +49,7 @@ const RESEND_API_KEY =
 
 const REMINDER_RECIPIENT =
   Deno.env.get('REMINDER_RECIPIENT') ??
-  'santoniushasibuan1@gmail.com'
+  'engineer.tsismart@gmail.com'
 
 const REMINDER_RECIPIENTS =
   REMINDER_RECIPIENT
@@ -170,6 +170,512 @@ function formatJakartaDateTime(
     ).format(new Date(value)) +
     ' WIB'
   )
+}
+
+/* ============================================================
+ * INPUT INSPECTION REMINDER TIME / DATE HELPERS
+ * ============================================================
+ */
+
+function getJakartaHour(): number {
+  const hour = new Intl.DateTimeFormat(
+    'en-US',
+    {
+      timeZone: 'Asia/Jakarta',
+      hour: '2-digit',
+      hour12: false,
+    },
+  ).format(new Date())
+
+  return Number(hour)
+}
+
+function getJakartaWeekday(): number {
+  const weekday =
+    new Intl.DateTimeFormat(
+      'en-US',
+      {
+        timeZone: 'Asia/Jakarta',
+        weekday: 'short',
+      },
+    ).format(new Date())
+
+  const weekdayMap: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  }
+
+  return weekdayMap[weekday] ?? 0
+}
+
+function getJakartaDateFromValue(
+  value: string,
+): string {
+  return new Intl.DateTimeFormat(
+    'en-CA',
+    {
+      timeZone: 'Asia/Jakarta',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+    },
+  ).format(new Date(value))
+}
+
+function formatInspectionReminderDate(
+  value: string | null,
+): string {
+  if (!value) {
+    return 'No previous input found'
+  }
+
+  const [
+    year,
+    month,
+    day,
+  ] = value.split('-')
+
+  return `${day}-${month}-${year}`
+}
+
+/* ============================================================
+ * INPUT INSPECTION REMINDER
+ * ============================================================
+ */
+
+function buildInspectionReminderEmail(
+  reminderDate: string,
+  lastInputDate: string | null,
+) {
+  const displayReminderDate =
+    formatInspectionReminderDate(
+      reminderDate,
+    )
+
+  const displayLastInputDate =
+    formatInspectionReminderDate(
+      lastInputDate,
+    )
+
+  const subject =
+    `[ATTENTION] Input Inspection Belum Diisi - ${displayReminderDate}`
+
+  const html = `
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+
+  <title>
+    Input Inspection Reminder
+  </title>
+</head>
+
+<body style="
+  margin:0;
+  padding:0;
+  background:#f4f6f8;
+  font-family:Arial,Helvetica,sans-serif;
+  color:#172033;
+">
+
+  <div style="
+    max-width:650px;
+    margin:30px auto;
+    padding:20px;
+  ">
+
+    <div style="
+      background:#ffffff;
+      border:1px solid #e1e5ea;
+      border-radius:10px;
+      overflow:hidden;
+    ">
+
+      <!-- HEADER -->
+
+      <div style="
+        padding:22px 24px;
+        background:#172033;
+        color:#ffffff;
+      ">
+
+        <h2 style="
+          margin:0;
+          color:#f59e0b;
+          font-size:21px;
+        ">
+          INPUT INSPECTION REMINDER
+        </h2>
+
+        <p style="
+          margin:8px 0 0;
+          color:#dbe3ec;
+          font-size:14px;
+        ">
+          TSI SMART PRODUCTS
+        </p>
+
+      </div>
+
+
+      <!-- CONTENT -->
+
+      <div style="
+        padding:24px;
+        line-height:1.6;
+      ">
+
+        <p>
+          Sistem mendeteksi bahwa belum ada
+          <strong>Input Inspection</strong>
+          untuk tanggal:
+        </p>
+
+        <p style="
+          font-size:18px;
+          font-weight:bold;
+          color:#172033;
+        ">
+          ${escapeHtml(
+            displayReminderDate,
+          )}
+        </p>
+
+
+        <!-- LAST INPUT -->
+
+        <table
+          cellpadding="10"
+          cellspacing="0"
+          style="
+            width:100%;
+            border-collapse:collapse;
+            margin:20px 0;
+          "
+        >
+
+          <tr>
+
+            <td style="
+              width:45%;
+              border:1px solid #dfe3e8;
+              background:#f8fafc;
+            ">
+              <strong>
+                Last Date Input
+              </strong>
+            </td>
+
+            <td style="
+              border:1px solid #dfe3e8;
+            ">
+              ${escapeHtml(
+                displayLastInputDate,
+              )}
+            </td>
+
+          </tr>
+
+        </table>
+
+
+        <!-- ATTENTION -->
+
+        <div style="
+          margin:22px 0;
+          padding:18px;
+          background:#fff7ed;
+          border:1px solid #fdba74;
+          border-radius:8px;
+          color:#9a3412;
+        ">
+
+          <strong>
+            ATTENTION
+          </strong>
+
+          <p style="
+            margin:10px 0 0;
+          ">
+            Mohon segera mengisi
+            <strong>
+              Input Inspection
+            </strong>
+            untuk tanggal hari ini pada
+            Gas Tank Monitoring System.
+          </p>
+
+        </div>
+
+
+        <p style="
+          color:#475467;
+        ">
+          Reminder ini dikirim karena sampai waktu
+          pengecekan harian belum terdapat data
+          inspection untuk tanggal tersebut.
+        </p>
+
+
+        <hr style="
+          border:0;
+          border-top:1px solid #e1e5ea;
+          margin:25px 0;
+        ">
+
+
+        <p style="
+          margin:0;
+          color:#687386;
+          font-size:12px;
+        ">
+          TSI SMART PRODUCTS<br>
+          Gas Tank Monitoring System
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</body>
+
+</html>
+`
+
+  return {
+    subject,
+    html,
+  }
+}
+
+async function hasInspectionReminderBeenSent(
+  reminderDate: string,
+): Promise<boolean> {
+  const {
+    data,
+    error,
+  } = await supabaseAdmin
+    .from(
+      'inspection_reminder_logs',
+    )
+    .select('id')
+    .eq(
+      'reminder_date',
+      reminderDate,
+    )
+    .eq(
+      'recipient_email',
+      REMINDER_RECIPIENT,
+    )
+    .limit(1)
+
+  if (error) {
+    throw new Error(
+      `Failed to check inspection reminder log: ${error.message}`,
+    )
+  }
+
+  return Boolean(
+    data &&
+    data.length > 0,
+  )
+}
+
+async function processInspectionReminder(
+  inspections: InspectionRow[],
+  reminderDate: string,
+) {
+  /*
+   * This branch is intentionally separated from
+   * the existing gas-pressure reminder.
+   *
+   * Scheduler:
+   * 15:00 UTC = 22:00 WIB
+   *
+   * At 03:00 UTC = 10:00 WIB, this branch is skipped.
+   */
+  const jakartaHour =
+    getJakartaHour()
+
+  if (jakartaHour !== 22) {
+    return {
+      action:
+        'skip_not_22_wib',
+      jakarta_hour:
+        jakartaHour,
+    }
+  }
+
+  /*
+   * Sunday:
+   * No Input Inspection reminder.
+   */
+  const weekday =
+    getJakartaWeekday()
+
+  if (weekday === 0) {
+    return {
+      action:
+        'skip_sunday',
+    }
+  }
+
+  /*
+   * Check whether at least one inspection
+   * exists today based on Jakarta calendar date.
+   */
+  const todayInspections =
+    inspections.filter(
+      (inspection) =>
+        getJakartaDateFromValue(
+          inspection.inspection_date,
+        ) === reminderDate,
+    )
+
+  if (
+    todayInspections.length > 0
+  ) {
+    return {
+      action:
+        'skip_inspection_exists_today',
+      inspection_count:
+        todayInspections.length,
+    }
+  }
+
+  /*
+   * Prevent duplicate email.
+   */
+  const alreadySent =
+    await hasInspectionReminderBeenSent(
+      reminderDate,
+    )
+
+  if (alreadySent) {
+    return {
+      action:
+        'skip_already_sent_today',
+    }
+  }
+
+  /*
+   * Find the latest inspection before today.
+   */
+  const previousInspections =
+    inspections
+      .filter(
+        (inspection) =>
+          getJakartaDateFromValue(
+            inspection.inspection_date,
+          ) < reminderDate,
+      )
+      .sort(
+        (a, b) =>
+          new Date(
+            b.inspection_date,
+          ).getTime() -
+          new Date(
+            a.inspection_date,
+          ).getTime(),
+      )
+
+  const lastInputDate =
+    previousInspections.length > 0
+      ? getJakartaDateFromValue(
+          previousInspections[0]
+            .inspection_date,
+        )
+      : null
+
+  /*
+   * Build email.
+   */
+  const email =
+    buildInspectionReminderEmail(
+      reminderDate,
+      lastInputDate,
+    )
+
+  /*
+   * Send through the existing Resend setup.
+   */
+  const {
+    data: sent,
+    error: sendError,
+  } =
+    await resend.emails.send({
+      from:
+        EMAIL_FROM,
+      to:
+        REMINDER_RECIPIENTS,
+      subject:
+        email.subject,
+      html:
+        email.html,
+    })
+
+  if (sendError) {
+    throw new Error(
+      `Resend error for Input Inspection reminder: ${sendError.message}`,
+    )
+  }
+
+  /*
+   * Save reminder log.
+   */
+  const {
+    error: logError,
+  } =
+    await supabaseAdmin
+      .from(
+        'inspection_reminder_logs',
+      )
+      .insert({
+        reminder_date:
+          reminderDate,
+        recipient_email:
+          REMINDER_RECIPIENT,
+        last_input_date:
+          lastInputDate,
+        provider_message_id:
+          sent?.id ?? null,
+      })
+
+  /*
+   * Ignore duplicate insert caused by
+   * concurrent execution.
+   */
+  if (
+    logError &&
+    logError.code !==
+      '23505'
+  ) {
+    throw new Error(
+      `Failed to save inspection reminder log: ${logError.message}`,
+    )
+  }
+
+  return {
+    action:
+      logError
+        ? 'sent_but_duplicate_log'
+        : 'sent',
+    reminder_date:
+      reminderDate,
+    last_input_date:
+      lastInputDate,
+    message_id:
+      sent?.id ?? null,
+  }
 }
 
 /* ============================================================
@@ -1146,6 +1652,17 @@ Deno.serve(
           inspections,
         )
 
+      /*
+       * Input Inspection reminder is a separate
+       * time-gated branch. It only runs at 22:00 WIB.
+       * The existing gas reminder logic below is unchanged.
+       */
+      const inspectionReminder =
+        await processInspectionReminder(
+          inspections,
+          reminderDate,
+        )
+
       const results: Array<
         Record<string, unknown>
       > = []
@@ -1389,6 +1906,8 @@ Deno.serve(
         processed_gases:
           activeCycles.length,
         results,
+        inspection_reminder:
+          inspectionReminder,
       })
     } catch (error) {
       console.error(
